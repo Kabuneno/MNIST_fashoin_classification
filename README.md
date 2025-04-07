@@ -92,11 +92,3 @@ Categories:
 
 The current implementation achieves approximately 80-85% accuracy on the test set without complex architectures or hyperparameter tuning, demonstrating the effectiveness of even simple machine learning models on this dataset.
 
-## Extensions
-
-Possible ways to extend this project:
-- Implement additional layers to create a deep neural network
-- Add regularization techniques to prevent overfitting
-- Experiment with different activation functions
-- Implement momentum or adaptive learning rate methods
-- Create a web interface for uploading and classifying custom images
