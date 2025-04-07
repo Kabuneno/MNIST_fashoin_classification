@@ -1,13 +1,17 @@
+
+
+
 import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 from tensorflow.keras.datasets import fashion_mnist
+from tqdm import tqdm
+
 
 
 (X_train, y_train), (X_test, y_test) = fashion_mnist.load_data()
 X_train_train = X_train.reshape(X_train.shape[0],-1)
 X_test_test = X_test.reshape(X_test.shape[0],-1)
-
 
 
 
@@ -50,7 +54,8 @@ def update_values(Wd,bd,learning_rate = 0.005):
 
 def train(X,y,epochs = 100 , batch_size =  32):
   m = X.shape[0]
-  for epoch in range(epochs):
+  print("Training model...")
+  for epoch in  tqdm(range(epochs),total = epochs ,desc="Training Progress"):
     indixes = np.random.permutation(m)
     X_shufle  = X[indixes]
     # X_shufle  = X_shufle.reshape(X_shufle.shape[0],-1)
@@ -64,20 +69,36 @@ def train(X,y,epochs = 100 , batch_size =  32):
       dW, db = compute_gradients(X_batch,Z,y_on_hot)
 
       update_values(dW,db)
+    # print("fe")
     # if epoch % 10 == 0:
     #   print(loss)
 
+def accuracy_score(y_pred,y_true):
+  res = 0
+  array = [1 if y_pred[i] == y_true[i] else 0 for i in range(y_pred.shape[0])]
+  for i in array:
+    res+= i
+  return 1 / y_pred.shape[0] * res
+
+
+def get_whole_pred(X):
+  res = soft_max(forward_pass(X))
+  res_res = res.tolist()
+  real_res = [ res_res[i].index(max(res_res[i]) ) for i in range(len(res_res))]
+  # res = res.index(max(res))
+  real_res = np.array(real_res,dtype=np.uint8)
+  return real_res
+
 
 train(X_train_train,y_train)
+print("Training finished!")
+print("Accuracy is actually",accuracy_score(get_whole_pred(X_test_test),y_test)* 100,"%")
 
 def get_pred(X):
   res = soft_max(forward_pass(X))
   res_res = res.tolist()
   res = res_res[0].index(max(res_res[0]))
   return res
-
-
-
 
 fashion_mnist_classes = [
     "T-shirt/top",
@@ -93,35 +114,20 @@ fashion_mnist_classes = [
 ]
 
 
-
-
 def want_to_know(j,m):
   for i in range (j,m):
     plt.imshow(X_test[i])
     plt.show()
 
     if get_pred(X_test_test[i]) == y_test[i]:
-      print(f"Выглядит как {fashion_mnist_classes[get_pred(X_test_test[i])] }")
+      print(f"looks like {fashion_mnist_classes[get_pred(X_test_test[i])] }")
       print("✅")
     else:
-      print(f"Выглядит как {fashion_mnist_classes[get_pred(X_test_test[i])]} но это {fashion_mnist_classes[y_test[i]]}")
-      print("🔴")
+      print(f"Looks like {fashion_mnist_classes[get_pred(X_test_test[i])]} but that's {fashion_mnist_classes[y_test[i]]}")
+      print("❌")
 
 
-def accuracy_score(y_pred,y_true):
-  res = 0
-  array = [1 if y_pred[i] == y_true[i] else 0 for i in range(y_pred.shape[0])]
-  for i in array:
-    res+= i
-  return 1 / y_pred.shape[0] * res
 
-def get_whole_pred(X):
-  res = soft_max(forward_pass(X))
-  res_res = res.tolist()
-  real_res = [ res_res[i].index(max(res_res[i]) ) for i in range(len(res_res))]
-  # res = res.index(max(res))
-  real_res = np.array(real_res,dtype=np.uint8)
-  return real_res
 
-print("Accuracy is actually",accuracy_score(get_whole_pred(X_test_test),y_test)* 100,"%")
-want_to_know(10,20)
+
+want_to_know(20,30)
